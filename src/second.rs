@@ -295,7 +295,7 @@ mod test {
 			list.push(*val);
 		}
 
-		vals.reverse();
+		list.reverse();
 
 		let mut list_iter = list.iter();
 
