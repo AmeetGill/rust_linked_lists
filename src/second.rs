@@ -1,4 +1,3 @@
-
 pub struct List<T> {
     head: Link<T>,
 }
@@ -15,19 +14,20 @@ pub struct IterMut<'a, T> {
 
 type Link<T> = Option<Box<Node<T>>>;
 
+#[derive(Debug)]
 pub struct Node<T> {
     elem: T,
     pub next: Link<T>
 }
 
-impl<T> Iterator for IntoIter<T> {
+impl<T: std::fmt::Debug> Iterator for IntoIter<T> {
     type Item = T;
     fn next(&mut self) -> Option<Self::Item> {
         self.0.pop()
     }
 }
 
-impl<'a, T> Iterator for Iter<'a, T> {
+impl<'a, T: std::fmt::Debug> Iterator for Iter<'a, T> {
     type Item = &'a T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -39,7 +39,7 @@ impl<'a, T> Iterator for Iter<'a, T> {
 
 }
 
-impl<'a, T> Iterator for IterMut<'a, T> {
+impl<'a, T: std::fmt::Debug> Iterator for IterMut<'a, T> {
     type Item = &'a mut T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -53,7 +53,9 @@ impl<'a, T> Iterator for IterMut<'a, T> {
 
 
 
-impl<T> List<T> {
+impl<T> List<T> 
+	where T : std::fmt::Debug
+{
     pub fn new() -> Self {
         List { head: None }
     }
@@ -121,6 +123,32 @@ impl<T> List<T> {
 
         return false;
     }
+
+	pub fn reverse(&mut self) {
+		
+		if self.head.is_none() || self.head.as_ref().unwrap().next.is_none() {
+			return ();
+		}
+
+		let mut prev_node: Option<Box<Node<T>>> = self.head.take();
+		let mut curr_node: Option<Box<Node<T>>> = prev_node.as_mut().unwrap().next.take();
+
+		while let Some(next_node) = curr_node.as_mut().unwrap().next.take() {
+			println!("curr = {:?} \n prev = {:?} \n next = {:?} ", curr_node, prev_node, next_node);
+			let temp_next_node: Option<Box<Node<T>>> = Some(next_node);
+
+			curr_node.as_mut().unwrap().next = prev_node;
+			
+			prev_node = curr_node;
+			curr_node = temp_next_node; 
+
+		}
+
+		curr_node.as_mut().unwrap().next = prev_node;
+		self.head = curr_node;
+		
+	}
+
 }
 
 
@@ -253,4 +281,28 @@ mod test {
         assert_eq!(list.contains_cycle(),false);
 
     }
+
+	#[test]
+	fn check_reverse() {
+		let mut vals: Vec<i32> = vec![2,3,4,5,6,7];
+
+		let mut list = super::List::<i32>::new();
+		list.reverse();
+
+		assert_eq!(list.iter().next(),None);
+
+		for val in vals.iter() {
+			list.push(*val);
+		}
+
+		vals.reverse();
+
+		let mut list_iter = list.iter();
+
+		for val in vals.iter() {
+			assert_eq!(val,list_iter.next().unwrap());
+		}
+
+	}	
+
 }

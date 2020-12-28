@@ -81,49 +81,6 @@ impl<T> List<T> {
         })
     }
 
-    pub fn contains_cycle(&self) -> bool {
-        if self.head.is_none() {
-            return false;
-        }
-
-        let mut slow_ptr: Option<&Box<Node<T>>> = self.head.as_ref();
-        let mut fast_ptr: Option<&Box<Node<T>>> = self.head.as_ref().unwrap().next.as_ref();
-
-        while let Some(node_ref) = fast_ptr.unwrap().next.as_ref() {
-            slow_ptr = slow_ptr.unwrap().next.as_ref();
-            if fast_ptr.is_some() {
-                fast_ptr = node_ref.next.as_ref();
-            } else {
-                break;
-            }
-
-            if slow_ptr.unwrap() as *const _  == fast_ptr.unwrap() as *const _ {
-                return false;
-            }
-        }
-
-        return false;
-    }        }
-
-        let mut slow_ptr: Option<&Box<Node<T>>> = self.head.as_ref();
-        let mut fast_ptr: Option<&Box<Node<T>>> = self.head.as_ref().unwrap().next.as_ref();
-
-        while let Some(node_ref) = fast_ptr.unwrap().next.as_ref() {
-            slow_ptr = slow_ptr.unwrap().next.as_ref();
-            if fast_ptr.is_some() {
-                fast_ptr = node_ref.next.as_ref();
-            } else {
-                break;
-            }
-
-            if slow_ptr.unwrap() as *const _  == fast_ptr.unwrap() as *const _ {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
 }
 
 #[cfg(test)]
